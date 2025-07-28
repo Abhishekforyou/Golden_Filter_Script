@@ -4,3 +4,4 @@ pandas
 yfinance
 schedule
 python-dotenv
+nsetools
