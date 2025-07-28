@@ -1,31 +1,58 @@
 import os
-import requests
-from datetime import datetime
-import pytz
+import logging
+import schedule
 import time
-import telegram
+import datetime
+from telegram import Bot, InputFile
+from telegram.error import TelegramError
+from PIL import Image
 
-# Environment variables
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")
+# Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
-bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+# Bot token and chat ID
+BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
+bot = Bot(token=BOT_TOKEN)
 
-def get_ist_time():
-    ist = pytz.timezone("Asia/Kolkata")
-    return datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
+# Image validation using Pillow
+def is_valid_image(file_path):
+    try:
+        with Image.open(file_path) as img:
+            img.verify()
+        return True
+    except Exception as e:
+        logger.warning(f"Image validation failed: {e}")
+        return False
 
-def check_market_conditions():
-    # Placeholder for Golden Filter logic
-    return "✅ Golden Filter Scan Complete: No trade-worthy stock at the moment."
+# Core sending logic
+def send_golden_filter_update():
+    try:
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        message = f"📈 Golden Filter Pro — Daily Stock Alert ({today})\n\n✅ Market is open. Here are your top picks for today."
+        bot.send_message(chat_id=CHAT_ID, text=message)
 
-def send_telegram_alert():
-    now = get_ist_time()
-    message = f"<b>Golden Filter Pro Alert</b>\n🕒 Time: {now}\n\n"
-    message += check_market_conditions()
-    bot.send_message(chat_id=CHAT_ID, text=message, parse_mode="HTML")
+        chart_path = "chart.jpg"  # Or your actual chart filename
 
+        if os.path.exists(chart_path) and is_valid_image(chart_path):
+            with open(chart_path, 'rb') as image:
+                bot.send_photo(chat_id=CHAT_ID, photo=InputFile(image))
+        else:
+            logger.warning("Chart image missing or invalid format.")
+
+    except TelegramError as e:
+        logger.error(f"Telegram error: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+
+# Schedule task (e.g., 9:00 AM IST)
+schedule.every().day.at("09:00").do(send_golden_filter_update)
+
+# Start scheduler
 if __name__ == "__main__":
-    print("Starting Golden Filter Bot...")
-    send_telegram_alert()
-    print("Message sent!")
+    logger.info("Golden Filter Bot started.")
+    send_golden_filter_update()  # Optional: trigger immediately on startup
+    while True:
+        schedule.run_pending()
+        time.sleep(30)
