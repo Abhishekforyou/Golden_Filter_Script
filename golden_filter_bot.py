@@ -1,14 +1,23 @@
 import os
 import requests
-from datetime import datetime
-import pytz
 import threading
 import time
+from datetime import datetime
+import pytz
+from flask import Flask
 
-# Get credentials from environment variables
+# Setup Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
+# Initialize Flask app (dummy server for Render)
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Golden Filter Bot is running!"
+
+# Bot logic
 def send_telegram_alert(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
@@ -16,11 +25,9 @@ def send_telegram_alert(message):
         "text": message,
         "parse_mode": "HTML"
     }
-    response = requests.post(url, data=payload)
-    return response.ok
+    requests.post(url, data=payload)
 
 def check_market_conditions():
-    # Placeholder for your Golden Filter Pro logic
     return "✅ Golden Filter Scan Complete: No trade-worthy stock at the moment."
 
 def run_bot():
@@ -30,13 +37,9 @@ def run_bot():
         message = f"<b>Golden Filter Pro Alert</b>\nTime: {now}\n"
         message += check_market_conditions()
         send_telegram_alert(message)
+        time.sleep(600)  # every 10 minutes
 
-        time.sleep(600)  # Wait 10 minutes before next alert
-
-if __name__ == "__main__":
-    # Start bot in a separate thread
+if __name__ == '__main__':
     threading.Thread(target=run_bot).start()
-
-    # Keep the web service alive for Render
-    while True:
-        time.sleep(60)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
