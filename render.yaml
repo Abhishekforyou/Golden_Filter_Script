@@ -3,6 +3,7 @@ services:
     name: golden-filter-bot
     schedule: "*/10 * * * *"
     env: python
+    pythonVersion: 3.10
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python golden_filter_bot.py"
     envVars:
