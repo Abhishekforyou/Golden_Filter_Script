@@ -1,7 +1,2 @@
-python-telegram-bot==20.3
 requests
-pandas
-yfinance
-schedule
 python-dotenv
-nsetools

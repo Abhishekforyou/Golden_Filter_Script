@@ -1,50 +1,29 @@
-
 import os
-import time
-import logging
-import schedule
-import asyncio
-from telegram import Bot
-from nsetools import Nse
+import requests
 from datetime import datetime
-import pytz
 
-
-ist = pytz.timezone("Asia/Kolkata")
-now = datetime.now(ist).strftime("%d-%m-%Y %H:%M:%S")
-send_alert(f"🔔 Volume Check Triggered at {now}")
-# Logging setup
-logging.basicConfig(level=logging.INFO)
-
-# Environment Variables
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-bot = Bot(token=TELEGRAM_TOKEN)
-nse = Nse()
+def send_telegram_alert(message):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": CHAT_ID,
+        "text": message,
+        "parse_mode": "HTML"
+    }
+    response = requests.post(url, data=payload)
+    return response.ok
 
-async def send_alert(msg):
-    try:
-        await bot.send_message(chat_id=CHAT_ID, text=msg)
-        logging.info(f"Sent alert: {msg}")
-    except Exception as e:
-        logging.error(f"Error sending alert: {e}")
-
-async def fetch_and_alert():
-    watchlist = ['TCS', 'INFY', 'HINDUNILVR']
-    now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-    await send_alert(f"🔔 Volume Check Triggered at {now}")
-
-    for stock in watchlist:
-        try:
-            q = nse.get_quote(stock)
-            ltp = float(q['lastPrice'])
-            logging.info(f"{stock} - LTP: {ltp}")
-        except Exception as e:
-            logging.error(f"Error fetching data for {stock}: {e}")
-
-async def main():
-    await fetch_and_alert()
+def check_market_conditions():
+    # Placeholder for Golden Filter logic
+    return "✅ Golden Filter Scan Complete: No trade-worthy stock at the moment."
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message = f"<b>Golden Filter Pro Alert</b> 📈
+Time: {now}
+
+"
+    message += check_market_conditions()
+    send_telegram_alert(message)

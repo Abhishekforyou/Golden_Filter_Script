@@ -1,0 +1,12 @@
+services:
+  - type: cron
+    name: golden-filter-bot
+    schedule: "*/10 * * * *"
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python golden_filter_bot.py"
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: CHAT_ID
+        sync: false
