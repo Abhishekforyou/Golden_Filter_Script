@@ -1,4 +1,10 @@
-requests
-python-dotenv
-pytz
 python-telegram-bot==13.15
+flask==2.2.5
+requests
+pandas
+yfinance
+schedule
+bs4
+numpy
+lxml
+nsetools
