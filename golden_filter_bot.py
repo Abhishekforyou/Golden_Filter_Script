@@ -18,7 +18,8 @@ def send_telegram_alert(message):
 
 def check_market_conditions():
     # Placeholder for Golden Filter logic
-    return "✅ Golden Filter Scan Complete: No trade-worthy stock at the 
+    return "✅ Golden Filter Scan Complete: No trade-worthy stock at the moment."
+    
 
 "
   if __name__ == "__main__":
