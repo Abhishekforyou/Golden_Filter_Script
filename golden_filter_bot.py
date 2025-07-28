@@ -17,18 +17,12 @@ def send_telegram_alert(message):
     return response.ok
 
 def check_market_conditions():
-    # Placeholder for Golden Filter logic
+    # ✅ Placeholder message — no syntax error now
     return "✅ Golden Filter Scan Complete: No trade-worthy stock at the moment."
-    
 
-"
-  if __name__ == "__main__":
+if __name__ == "__main__":
     ist = pytz.timezone("Asia/Kolkata")
     now = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
     message = f"<b>Golden Filter Pro Alert</b>\nTime: {now}\n"
     message += check_market_conditions()
-    send_telegram_alert(message)
-
-
-message += check_market_conditions()
     send_telegram_alert(message)
