@@ -7,7 +7,12 @@ import asyncio
 from telegram import Bot
 from nsetools import Nse
 from datetime import datetime
+import pytz
 
+
+ist = pytz.timezone("Asia/Kolkata")
+now = datetime.now(ist).strftime("%d-%m-%Y %H:%M:%S")
+send_alert(f"🔔 Volume Check Triggered at {now}")
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 
